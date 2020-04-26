@@ -57,6 +57,8 @@ public class StudentDAO {
             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM STUDENT WHERE STUDENTID = ?");
             preparedStatement.setInt(1, id);
             deleteResult = preparedStatement.execute();
+
+            connection.close();
         }
         catch (Exception e)
         {
@@ -65,6 +67,33 @@ public class StudentDAO {
 
         return deleteResult;
     }
+
+    public Student getbyId(int id) throws SQLException {
+        Student student = null;
+
+        try {
+            OracleConnection connection = getConnection();
+            String query = "SELECT STUDENTID, NAME, PHONE FROM STUDENT WHERE STUDENTID = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery(query);
+            // Tại ở đây mình tìm theo id á, nên hoạc là hong có, hoặc là chỉ có 1 nên a gán luôn dô student
+            while(resultSet.next()) {
+                student = new Student();
+                student.StudentId = resultSet.getInt("STUDENTID");
+                student.Name = resultSet.getString("NAME");
+                student.Phone = resultSet.getString("PHONE");
+            }
+
+            connection.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return student;
+    }
+
 
     private OracleConnection getConnection() throws SQLException {
         // Khởi tạo 1 đối tượng Properties để chứa mấy thông số trên kia
